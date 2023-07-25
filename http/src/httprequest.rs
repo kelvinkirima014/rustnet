@@ -17,15 +17,71 @@ pub struct HttpRequest {
 
 impl From<String> for HttpRequest {
     fn from(req: String) -> Self {
-        todo!()        
+
+        let mut parsed_method = Method::Uninitialized;
+
+        let mut parsed_version = Version::VersionOne;
+
+        let mut parsed_resource = Resource::Path("".to_string());
+
+        let mut parsed_headers = HashMap::new();
+
+        let mut parsed_body = "";
+
+        //Read each line in the incoming HTTP request
+        //and Evaluate each line
+        for line in req.lines() {
+
+            //if line is an HTTP request line
+            if line.contains("HTTP") {
+
+                //extract the method,HTTP version, and path(resource/url)
+                let (method, resource, version) = process_request_line(line);
+                parsed_method = method;
+                parsed_version = version;
+                parsed_resource = resource;
+
+                //else if line is a header line(contains ':' separator)
+            } else if line.contains(":") {
+
+                //extract Key and Value
+                let (key, value) = process_header_line(line);
+
+                //and add them to the list of request headers
+                parsed_headers.insert(key, value);
+
+                //else if empty, no action
+            } else if line.len() == 0 {
+                println!("empty line");
+
+                //if none of these, treat it as a message body
+                //by scanning and storing the string
+            } else {
+                parsed_body = line;
+            }
+        }
+
+        // above, we try to detect the various types
+        //of lines in the incoming HTTP Request, and then construct an
+        //HTTPRequest struct with the parsed values
+        
+        HttpRequest {
+             method: parsed_method, 
+             version: parsed_version, 
+             resource: parsed_resource, 
+             headers: parsed_headers, 
+             body: parsed_body.to_string(), 
+        }
+
+
     }
 }
 
-fn process_request_line(s: &str) -> (Method, Resource, Version) {
+fn process_request_line(_s: &str) -> (Method, Resource, Version) {
     todo!()
 }
 
-fn process_header_line(s: &str) -> (String, String) {
+fn process_header_line(_s: &str) -> (String, String) {
     todo!()
 }
 
