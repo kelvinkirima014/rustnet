@@ -1,9 +1,5 @@
 use std::collections::HashMap;
 
-#[derive(Debug, PartialEq)]
-pub enum Resource {
-    Path(String),
-}
 
 #[derive(Debug)]
 pub struct HttpRequest {
@@ -77,8 +73,32 @@ impl From<String> for HttpRequest {
     }
 }
 
-fn process_request_line(_s: &str) -> (Method, Resource, Version) {
-    todo!()
+
+//process the request line of incoming HTTP request
+//by splitting the request into three parts(method, resource, version)
+//transform the splitted part into more structured data types
+//Mrhod, Resource, and Version
+fn process_request_line(s: &str) -> (Method, Resource, Version) {
+    
+    //parse the request line into individual chunks
+    //request line typically looks like:
+    //"GET /index.html HTTP/1.1" 
+    let mut words = s.split_whitespace();
+
+    //Extract the HTTP method(e.g "GET") from first part of the request line
+    let method = words.next().unwrap();
+
+    //Extract the resource(URI/URL)(e.g /index.html) from the second part of the req
+    let resource = words.next().unwrap();
+
+    //Extract the HTTP version(e.g HTTP/1.1) from third part pf the request line
+    let version = words.next().unwrap();
+
+    (
+        method.into(),
+        Resource::Path(resource.to_string()),
+        version.into(),
+    )
 }
 
 fn process_header_line(_s: &str) -> (String, String) {
@@ -122,6 +142,12 @@ impl From<&str> for Version {
             _ => Version::Uninitialized,
         }
     }    
+}
+
+#[derive(Debug, PartialEq)]
+
+pub enum Resource {
+    Path(String),
 }
 
 
