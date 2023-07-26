@@ -103,14 +103,14 @@ fn process_request_line(s: &str) -> (Method, Resource, Version) {
 
 fn process_header_line(s: &str) -> (String, String) {
     
-    let mut header = s.split_whitespace();
+    let mut header = s.split(":");
 
     let key = header.next().unwrap();
 
     let value = header.next().unwrap();
 
     (
-        key.to_string(),
+        key.to_string(), 
         value.to_string(),
     )
 
@@ -178,6 +178,22 @@ mod tests {
     fn test_version_into() {
         let v: Version = "HTTP/1.1".into();
         assert_eq!(v, Version::VersionOne);
+    }
+
+    #[test]
+    fn test_read_http() {
+        let s: String = String::from("GET /hello HTTP/1.1\r\nH");
+
+        let mut headers_expected: HashMap<String, String> = HashMap::new();
+        headers_expected.insert("Host".into(), "localhost".into());
+        headers_expected.insert("Accept".into(), "*/*".into());
+        headers_expected.insert("User-Agent".into(), " curl/7.64.1".into());
+
+        let req: HttpRequest = s.into();
+
+        assert_eq!(Method::Get, req.method);
+        assert_eq!(Version::VersionOne, req.version);
+        assert_eq!(Resource::Path("/hello".to_string()), req.resource);
     }
 
 }
