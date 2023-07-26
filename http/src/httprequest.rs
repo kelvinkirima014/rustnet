@@ -83,16 +83,16 @@ fn process_request_line(s: &str) -> (Method, Resource, Version) {
     //parse the request line into individual chunks
     //request line typically looks like:
     //"GET /index.html HTTP/1.1" 
-    let mut words = s.split_whitespace();
+    let mut request = s.split_whitespace();
 
     //Extract the HTTP method(e.g "GET") from first part of the request line
-    let method = words.next().unwrap();
+    let method = request.next().unwrap();
 
     //Extract the resource(URI/URL)(e.g /index.html) from the second part of the req
-    let resource = words.next().unwrap();
+    let resource = request.next().unwrap();
 
     //Extract the HTTP version(e.g HTTP/1.1) from third part pf the request line
-    let version = words.next().unwrap();
+    let version = request.next().unwrap();
 
     (
         method.into(),
@@ -101,8 +101,19 @@ fn process_request_line(s: &str) -> (Method, Resource, Version) {
     )
 }
 
-fn process_header_line(_s: &str) -> (String, String) {
-    todo!()
+fn process_header_line(s: &str) -> (String, String) {
+    
+    let mut header = s.split_whitespace();
+
+    let key = header.next().unwrap();
+
+    let value = header.next().unwrap();
+
+    (
+        key.to_string(),
+        value.to_string(),
+    )
+
 }
 
 
