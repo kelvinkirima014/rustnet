@@ -10,8 +10,14 @@ pub struct HttpRequest {
     pub body: String,
 }
 
-
+//this `From` trait converts a String to an HttpRequest data structure
+//enabling us to construct an HttpRequest from a String:)
+//it works by taking a `String` and splitting it into lines,
+//then parsing each line to populate the `HttpRequest` fields.
 impl From<String> for HttpRequest {
+
+    //it works by taking a `String` and splitting it into lines,
+    //then parsing each line to populate the `HttpRequest` fields.
     fn from(req: String) -> Self {
 
         let mut parsed_method = Method::Uninitialized;
