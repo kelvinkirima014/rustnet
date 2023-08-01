@@ -47,7 +47,7 @@ impl<'a> HttpResponse<'a> {
             self.head.status_code,
             self.head.status_text,
             headers_string,
-            self.body.to_string()
+            self.body
         )
     }
 
@@ -71,27 +71,12 @@ pub struct Parts<'a> {
 impl<'a> Parts<'a> {
     fn new() -> Self {
         let mut headers = HashMap::new();
-        headers.insert("Host".into(), "localhost".into());
+        headers.insert("Host", "localhost");
         Parts { 
             status_code: "200", 
             status_text: "OK", 
             headers, 
             version: Version::Uninitialized,
         }
-    }
-}
-
-
-impl From<Parts<'_>> for String{
-    fn from(value: Parts) -> Self {
-        let parts = value.clone();
-        format!(
-            "{} {} {:?}\r\n{:?}",
-            &parts.status_code,
-            &parts.status_text,
-            &parts.headers,
-            &parts.version
-
-        )
     }
 }

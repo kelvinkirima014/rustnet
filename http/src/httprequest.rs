@@ -53,7 +53,7 @@ impl From<String> for HttpRequest {
                 parsed_headers.insert(key, value);
 
                 //else if empty, no action
-            } else if line.len() == 0 {
+            } else if line.is_empty(){
                 println!("empty line");
 
                 //if none of these, treat it as a message body
