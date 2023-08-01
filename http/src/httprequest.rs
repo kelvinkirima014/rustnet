@@ -145,7 +145,7 @@ impl From<&str> for HttpMethod {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum  Version {
     VersionOne,
     VersionTwo,
