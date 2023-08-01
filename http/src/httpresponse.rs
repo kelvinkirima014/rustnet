@@ -5,33 +5,21 @@ use std::io::{Result, Write};
 use crate::httprequest::Version;
 
 #[derive(Debug, PartialEq, Clone)]
-pub struct HttpResponse<'a, T>{
+pub struct HttpResponse<'a>{
     pub head: Parts<'a>,
-    pub body: T,
+    pub body: String,
 }
 
-impl<'a, T: Default> Default for HttpResponse<'a, T>
-    where T: Debug, 
-{
+impl<'a> Default for HttpResponse<'a> {
     fn default() -> Self {
-        HttpResponse::new(T::default())
-    }
-}
-
-impl<'a, T: Default + Clone + std::fmt::Debug> From<HttpResponse<'a, T>> for String {
-    fn from(resp: HttpResponse<'a, T>) -> Self {
-        let resp = resp.clone();
-        format!(
-            "{:?} {:?}",
-            resp.head,
-            resp.body
-        )
+        let body = String::new();
+        HttpResponse::new(body)
     }
 }
 
 
-impl<'a, T: std::fmt::Debug> HttpResponse<'a, T> {
-    pub fn new(body: T) -> Self {
+impl<'a> HttpResponse<'a> {
+    pub fn new(body: String) -> Self {
          HttpResponse{
             body,
             head: Parts::new(),   
@@ -39,13 +27,29 @@ impl<'a, T: std::fmt::Debug> HttpResponse<'a, T> {
     }
 
     pub fn to_string(&self) -> String {
+
+        let mut headers_string = String::new();
+        for (name, value) in &self.head.headers {
+            headers_string.push_str(&format!(
+                "{}: {}\r\n",
+                name,
+                value
+            ))
+        }
+
         format!(
-            "{:?} {:?}",
-            self.head,
-            self.body
+            "HTTP/{} {} {}\r\n{}\r\n{}",
+            match self.head.version {
+                Version::VersionOne => "1.1",
+                Version::VersionTwo => "2.1",
+                Version::Uninitialized => "",
+            },
+            self.head.status_code,
+            self.head.status_text,
+            headers_string,
+            self.body.to_string()
         )
     }
-
 
     pub fn send_response(&self, stream_writer: &mut impl Write) -> Result<()> {
         let res = self.clone();
@@ -87,7 +91,6 @@ impl From<Parts<'_>> for String{
             &parts.status_text,
             &parts.headers,
             &parts.version
-
 
         )
     }
