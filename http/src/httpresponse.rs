@@ -10,16 +10,9 @@ pub struct HttpResponse<'a>{
     pub body: String,
 }
 
-impl<'a> Default for HttpResponse<'a> {
-    fn default() -> Self {
-        let body = String::new();
-        HttpResponse::new(body)
-    }
-}
-
-
 impl<'a> HttpResponse<'a> {
-    pub fn new(body: String) -> Self {
+    pub fn new() -> Self {
+        let body = String::new();
          HttpResponse{
             body,
             head: Parts::new(),   
@@ -68,9 +61,9 @@ pub struct Parts<'a> {
     pub version: Version,
 }
 
-impl<'a> Parts<'a> {
-    fn new() -> Self {
-        let mut headers = HashMap::new();
+impl Default for Parts<'_> {
+    fn default() -> Self {
+     let mut headers = HashMap::new();
         headers.insert("Host", "localhost");
         Parts { 
             status_code: "200", 
@@ -79,4 +72,39 @@ impl<'a> Parts<'a> {
             version: Version::Uninitialized,
         }
     }
+}
+
+impl<'a> Parts<'a> {
+    fn new() -> Self {
+        let mut response = Parts::default();
+
+        response.status_text = match  response.status_code {
+            "200" => "OK",
+            "400" => "Bad Request",
+            "404" => "NOt Found",
+            "500" => "Internal Server Error",
+            _=> "Not Found",
+        };
+        response
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_http_response_creation(){
+
+        let response = HttpResponse::new();
+
+        assert_eq!(response.body, "");
+        assert_eq!(response.head.status_code, "200");
+        assert_eq!(response.head.status_text, "OK");
+        assert_eq!(response.head.version, Version::Uninitialized);
+
+        assert!(response.head.headers.contains_key("Satan"));
+
+    }
+
 }
